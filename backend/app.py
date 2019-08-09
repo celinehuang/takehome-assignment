@@ -78,9 +78,7 @@ def get_by_id(id):
 
 @app.route("/shows", methods=["POST"])
 def create_show():
-
     response = request.json
-
     try:
         name = response["name"]
         episodes_seen = response["episodes_seen"]
@@ -95,6 +93,15 @@ def create_show():
         return create_response(status=422, message="Parameter(s) is missing")
     except ValueError as error:
         return create_response(status=422, message="Invalid value.")
+
+
+@app.route("/shows/<id>", methods=["PUT"])
+def update_show(id):
+    new_response = request.json
+    if db.getById("shows", int(id)) is None:
+        return create_response(status=404, message="No show with this id exists")
+    item = db.updateById("shows", int(id), new_response)
+    return create_response(status=201, message=new_response["name"])
 
 
 """
