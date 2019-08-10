@@ -54,7 +54,22 @@ def mirror(name):
 
 @app.route("/shows", methods=["GET"])
 def get_all_shows():
-    return create_response({"shows": db.get("shows")})
+
+    # check if there a query
+    min_episode = request.args.get("minEpisodes")
+    all_shows = db.get("shows")
+    if min_episode is not None:
+        filterd_shows = [
+            show for show in all_shows if show["episodes_seen"] >= int(min_episode)
+        ]
+
+        # filterd_shows = []
+        # for show in all_shows:
+        #     if show["episodes_seen"] >= int(min_episode):
+        #         filterd_shows.append(show)
+
+        return create_response({"shows": filterd_shows})
+    return create_response({"shows": all_shows})
 
 
 @app.route("/shows/<id>", methods=["DELETE"])
@@ -92,7 +107,7 @@ def create_show():
     except KeyError as error:
         return create_response(status=422, message="Parameter(s) is missing")
     except ValueError as error:
-        return create_response(status=422, message="Invalid value.")
+        return create_response(status=422, message="Invalid value")
 
 
 @app.route("/shows/<id>", methods=["PUT"])
